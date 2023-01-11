@@ -27,7 +27,17 @@ class WebDriver:
     if headless:
       options.add_argument("--headless")
 
+    options.add_argument("--incognito")
+
     self.web_driver = webdriver.Chrome(options=options, service=service)
+    self.web_driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+      "source": """
+      Object.defineProperty(navigator, 'webdriver', {
+        get: () => undefined
+      })
+      """
+    })
+
     self.timeout = timeout
 
   def page(self, url):
