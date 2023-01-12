@@ -266,7 +266,7 @@ class AuslanderbehordeBot(Bot):
   def has_error_message(self):
     return self.web_driver.has_element("//*[@class='errorMessage']")
 
-  def get_error_message(self):
+  def get_error_message(self): 
     return self.web_driver.get_content("//*[@class='errorMessage']")
 
   def check_available_appointments(self):
@@ -332,6 +332,7 @@ class AuslanderbehordeBot(Bot):
       raise Exception(f"No available date for \"{self.month}\" was found")
 
   def click_first_available_calendar_day(self):
+    print("Enter function: click day")
     self.web_driver.click("//a[contains(@class, 'ui-state-active')]")
 
     day = self.web_driver.get_content(
@@ -355,8 +356,8 @@ class AuslanderbehordeBot(Bot):
       print(f"({index}) {option}")
       index += 1
 
-    self.web_driver.select_by_index("//select[@name='dd_zeiten']", 0)
-    print(f"Clicking on the first available time, \"{options[0]}\"")
+    self.web_driver.select_by_index("//select[@name='dd_zeiten']", len(options)-1)
+    print(f"Clicking on the first available time, \"{options[len(options)-1]}\"")
 
   def fill_first_name(self):
     first_name = self.config.get("auslanderbehorde_bot", "first_name")
@@ -475,10 +476,10 @@ def main():
 
     # Summary
     auslanderbehorde_bot.wait_summary()
-    # auslanderbehorde_bot.click_book_appointment()
+    auslanderbehorde_bot.click_book_appointment()
 
     # Reservation
-    # auslanderbehorde_bot.click_appointment_confirmation_as_pdf_file()
+    auslanderbehorde_bot.click_appointment_confirmation_as_pdf_file()
 
   bot.loop(__load)
 
