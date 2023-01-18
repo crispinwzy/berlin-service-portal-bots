@@ -57,6 +57,21 @@ class AuslanderbehordeBot(Bot):
           "Applicant's number of residence title? (e.g. residence permit or EU Blue Card)"
       )
 
+    init_info = f"""[TP]开始抢外管局Termin
+    - 国籍: {self.config.get("auslanderbehorde_bot", "citizenship")}
+    - 预约人数: {self.config.get("auslanderbehorde_bot", "number_of_applicants")}
+    - 预约类型: {self.config.get("auslanderbehorde_bot", "service_level_1")}
+    - 预约服务: {self.config.get("auslanderbehorde_bot", "service_level_3")}
+    - 名: {self.config.get("auslanderbehorde_bot", "first_name")}
+    - 姓: {self.config.get("auslanderbehorde_bot", "last_name")}
+    - 生日: {self.config.get("auslanderbehorde_bot", "date_of_birth")}
+    - 邮箱: {self.config.get("auslanderbehorde_bot", "email")}
+    - 有无居留权: {self.config.get("auslanderbehorde_bot", "has_residence_title")}
+    - 现有居留/Visa号码: {self.config.get("auslanderbehorde_bot", "residence_title")}
+    """
+    print(init_info)
+    self.telegram_bot.send_text(init_info)
+
   def load_appointment_page(self):
     self.web_driver.page(
         "https://otv.verwalt-berlin.de/ams/TerminBuchen/wizardng?lang=en"
@@ -333,23 +348,43 @@ class AuslanderbehordeBot(Bot):
 
   def click_first_available_calendar_day(self):
     print("Enter function: click day")
-    self.web_driver.click("//a[contains(@class, 'ui-state-active')]")
 
-    day = self.web_driver.get_content(
-        "//a[contains(@class, 'ui-state-active')]"
-    )
+    if self.web_driver.has_element("//a[contains(@class, 'ui-state-active')]"):
+      self.web_driver.click("//a[contains(@class, 'ui-state-active')]")
 
-    month = self.web_driver.get_content(
-        "//a[contains(@class, 'ui-state-active')]/preceding::div[contains(@class, 'ui-datepicker-header')]//span[@class='ui-datepicker-month']"
-    )
+      day = self.web_driver.get_content(
+          "//a[contains(@class, 'ui-state-active')]"
+      )
 
-    print(
-        f"Clicking on the first available calendar date, {day} of {month}"
-    )
+      month = self.web_driver.get_content(
+          "//a[contains(@class, 'ui-state-active')]/preceding::div[contains(@class, 'ui-datepicker-header')]//span[@class='ui-datepicker-month']"
+      )
+
+      print(
+          f"Clicking on the first available calendar date, {day} of {month}"
+      )
+
+    elif self.web_driver.has_element("//a[contains(@class, 'ui-state-default')]"):
+      self.web_driver.click("//a[contains(@class, 'ui-state-default')]")
+
+      day = self.web_driver.get_content(
+          "//a[contains(@class, 'ui-state-default')]"
+      )
+
+      month = self.web_driver.get_content(
+          "//a[contains(@class, 'ui-state-default')]/preceding::div[contains(@class, 'ui-datepicker-header')]//span[@class='ui-datepicker-month']"
+      )
+
+      print(
+          f"Clicking on the first available calendar date, {day} of {month}"
+      )
 
   def select_first_available_time(self):
     options = self.web_driver.get_select_options_contents(
         "//select[@name='dd_zeiten']")
+
+    if len(options) == 2 and options[0].strip() == "":
+      raise Exception("No available time for the selected day")
 
     index = 0
     for option in options:
@@ -431,8 +466,8 @@ class AuslanderbehordeBot(Bot):
     xpath = "//div[@id='EN3']/a[@class='btnApplicationPdf']"
 
     # Appointment confirmation as PDF file
-    print(
-        f"Appointment confirmation PDF file link: {self.web_driver.get_attribute_content(xpath)}")
+    print(f"Appointment confirmation PDF file link: {self.web_driver.get_attribute_content(xpath, 'href')}")
+    self.telegram_bot.send_text(f"Appointment confirmation PDF file link: {self.web_driver.get_attribute_content(xpath, 'href')}")
     self.web_driver.click(xpath)
     print("Clicking on \"Appointment confirmation as PDF file\"")
 
