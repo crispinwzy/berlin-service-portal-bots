@@ -56,8 +56,10 @@ class AuslanderbehordeBot(Bot):
           "residence_title",
           "Applicant's number of residence title? (e.g. residence permit or EU Blue Card)"
       )
+    
+    self.worker_name = self.config.get("default", "worker_name")
 
-    init_info = f"""[TP]开始抢外管局Termin
+    init_info = f"""\[{self.worker_name}]开始抢外管局Termin
     - 国籍: {self.config.get("auslanderbehorde_bot", "citizenship")}
     - 预约人数: {self.config.get("auslanderbehorde_bot", "number_of_applicants")}
     - 预约类型: {self.config.get("auslanderbehorde_bot", "service_level_1")}
@@ -292,7 +294,7 @@ class AuslanderbehordeBot(Bot):
       time.sleep(self.refresh_interval)
 
       if self.has_appointment_selection():
-        self._notify("Appointments available")
+        self._notify(f"\[{self.worker_name}]Appointments available")
         break
       elif self.has_error_message():
         print(f"({count}) Error message: \"{self.get_error_message()}\"")
@@ -448,7 +450,7 @@ class AuslanderbehordeBot(Bot):
   def wait_summary(self):
     print("Waiting for the appointment summary")
     self.web_driver.wait_visibility("//button[@id='summaryForm:proceed']")
-    self._notify("Appointment summary")
+    self._notify(f"\[{self.worker_name}]Appointment summary")
 
   def click_book_appointment(self):
     # Appointment booking - Please check your data
@@ -467,7 +469,7 @@ class AuslanderbehordeBot(Bot):
 
     # Appointment confirmation as PDF file
     print(f"Appointment confirmation PDF file link: {self.web_driver.get_attribute_content(xpath, 'href')}")
-    self.telegram_bot.send_text(f"Appointment confirmation PDF file link: {self.web_driver.get_attribute_content(xpath, 'href')}")
+    self.telegram_bot.send_text(f"\[{self.worker_name}]Appointment confirmation PDF file link: {self.web_driver.get_attribute_content(xpath, 'href')}")
     self.web_driver.click(xpath)
     print("Clicking on \"Appointment confirmation as PDF file\"")
 
