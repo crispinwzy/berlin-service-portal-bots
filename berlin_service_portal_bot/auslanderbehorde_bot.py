@@ -281,10 +281,16 @@ class AuslanderbehordeBot(Bot):
     return self.web_driver.has_element("//legend[text()='Appointment selection']")
 
   def has_error_message(self):
-    return self.web_driver.has_element("//*[@class='errorMessage']")
+    return self.web_driver.has_element("//*[@class='errorMessage tabindex=']")
 
   def get_error_message(self): 
-    return self.web_driver.get_content("//*[@class='errorMessage']")
+    return self.web_driver.get_content("//*[@class='errorMessage tabindex=']")
+  
+  def has_progress_bar(self):
+    return self.web_driver.has_element("//div[@id='progressBar']")
+
+  def has_next_button(self):
+    return self.web_driver.has_element("//button[@name='applicationForm:managedForm:proceed']")
 
   def check_available_appointments(self):
     count = 0
@@ -293,15 +299,20 @@ class AuslanderbehordeBot(Bot):
     while 1:
       time.sleep(self.refresh_interval)
 
-      if self.has_appointment_selection():
-        self._notify(f"\[{self.worker_name}]Appointments available")
-        break
-      elif self.has_error_message():
+      if self.has_error_message():
         print(f"({count}) Error message: \"{self.get_error_message()}\"")
         count += 1
         not_found_count = 0
         time.sleep(3)
+        # self.click_next()
+        self.select_service_level_1()
+        self.select_service_level_2()
+        self.select_service_level_3()
+      elif not self.has_error_message() and self.has_progress_bar() and self.has_next_button():
         self.click_next()
+      elif self.has_appointment_selection():
+        self._notify(f"\[{self.worker_name}]Appointments available")
+        break
       else:
         not_found_count += 1
         if not_found_count > 3:
@@ -492,7 +503,7 @@ def main():
     auslanderbehorde_bot.select_service_level_2()
     auslanderbehorde_bot.select_service_level_3()
     auslanderbehorde_bot.wait_for_information_about_selected_service()
-    auslanderbehorde_bot.click_next()
+    # auslanderbehorde_bot.click_next()
     auslanderbehorde_bot.check_available_appointments()
 
     # Date selection
