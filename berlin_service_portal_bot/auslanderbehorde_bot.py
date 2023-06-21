@@ -286,11 +286,14 @@ class AuslanderbehordeBot(Bot):
   def get_error_message(self): 
     return self.web_driver.get_content("//*[@class='errorMessage tabindex=']")
   
-  def has_progress_bar(self):
-    return self.web_driver.has_element("//div[@id='progressBar']")
+  # def has_progress_bar(self):
+  #   return self.web_driver.has_element("//div[@id='progressBar']")
 
-  def has_next_button(self):
-    return self.web_driver.has_element("//button[@name='applicationForm:managedForm:proceed']")
+  # def has_next_button(self):
+  #   return self.web_driver.has_element("//button[@name='applicationForm:managedForm:proceed']")
+  
+  def has_clickable_next_button(self):
+    return self.web_driver.has_element("//button[@name='applicationForm:managedForm:proceed' and not(@disabled)]")
 
   def check_available_appointments(self):
     count = 0
@@ -308,7 +311,8 @@ class AuslanderbehordeBot(Bot):
         self.select_service_level_1()
         self.select_service_level_2()
         self.select_service_level_3()
-      elif not self.has_error_message() and self.has_progress_bar() and self.has_next_button():
+      elif self.has_clickable_next_button():
+        self._notify(f"\[{self.worker_name}]Next button clickable")
         self.click_next()
       elif self.has_appointment_selection():
         self._notify(f"\[{self.worker_name}]Appointments available")
