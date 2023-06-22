@@ -14,7 +14,7 @@ import time
 
 
 class WebDriver:
-  def __init__(self, headless, timeout):
+  def __init__(self, headless, timeout, incognito, detach):
     service = Service(ChromeDriverManager().install())
     options = webdriver.ChromeOptions()
     options.add_experimental_option("prefs", {
@@ -27,7 +27,11 @@ class WebDriver:
     if headless:
       options.add_argument("--headless")
 
-    options.add_argument("--incognito")
+    if incognito:
+      options.add_argument("--incognito")
+
+    if detach:
+      options.add_experimental_option("detach", True) # Keep the browser open after the script finishes
 
     self.web_driver = webdriver.Chrome(options=options, service=service)
     self.web_driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {

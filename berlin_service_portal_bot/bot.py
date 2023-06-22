@@ -22,6 +22,18 @@ class Bot:
         "What's the maximum time in seconds that I should wait for a response?"
     )
 
+    incognito = config.get_boolean(
+        "default",
+        "incognito",
+        "Should I start the browser in incognito mode?"
+    )
+
+    detach = config.get_boolean(
+        "default",
+        "detach",
+        "Should I close the browser when the script exits?"
+    )
+
     self.refresh_interval = config.get_int(
         "default",
         "refresh_interval",
@@ -43,7 +55,7 @@ class Bot:
 
     self.name = name
     self.config = config
-    self.web_driver = WebDriver(headless, timeout)
+    self.web_driver = WebDriver(headless, timeout, incognito, detach)
     self.telegram_bot = TelegramBot(telegram_bot_token, telegram_bot_chat)
 
   def _notify(self, text):
