@@ -292,8 +292,8 @@ class AuslanderbehordeBot(Bot):
   # def has_next_button(self):
   #   return self.web_driver.has_element("//button[@name='applicationForm:managedForm:proceed']")
   
-  def has_clickable_next_button(self):
-    return self.web_driver.has_element("//button[@name='applicationForm:managedForm:proceed' and not(@disabled)]")
+  # def has_clickable_next_button(self):
+  #   return self.web_driver.has_element("//button[@name='applicationForm:managedForm:proceed' and not(@disabled)]")
 
   def check_available_appointments(self):
     count = 0
@@ -307,13 +307,13 @@ class AuslanderbehordeBot(Bot):
         count += 1
         not_found_count = 0
         time.sleep(3)
-        # self.click_next()
-        self.select_service_level_1()
-        self.select_service_level_2()
-        self.select_service_level_3()
-      elif self.has_clickable_next_button():
-        self._notify(f"\[{self.worker_name}]Next button clickable")
         self.click_next()
+        # self.select_service_level_1()
+        # self.select_service_level_2()
+        # self.select_service_level_3()
+      # elif self.has_clickable_next_button():
+      #   self._notify(f"\[{self.worker_name}]Next button clickable")
+      #   self.click_next()
       elif self.has_appointment_selection():
         self._notify(f"\[{self.worker_name}]Appointments available")
         break
@@ -507,7 +507,7 @@ def main():
     auslanderbehorde_bot.select_service_level_2()
     auslanderbehorde_bot.select_service_level_3()
     auslanderbehorde_bot.wait_for_information_about_selected_service()
-    # auslanderbehorde_bot.click_next()
+    auslanderbehorde_bot.click_next()
     auslanderbehorde_bot.check_available_appointments()
 
     # Date selection
